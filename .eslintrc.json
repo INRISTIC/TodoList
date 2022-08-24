@@ -1,0 +1,65 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "ignorePatterns": ["node_modules", "dist", "build", "idea"],
+  "extends": ["eslint:recommended", "plugin:react/recommended", "airbnb", "plugin:prettier/recommended", "plugin:import/errors", "plugin:import/warnings"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module",
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": ["@babel/preset-react"]
+    }
+  },
+  "parser": "@babel/eslint-parser",
+  "plugins": ["react", "prettier", "import"],
+  "rules": {
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
+    "linebreak-style": [0, "unix"],
+    "quotes": ["error", "single"],
+    "semi": [0, "always"],
+    "max-len": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/control-has-associated-label": "off",
+    "object-curly-newline": "off",
+    "comma-dangle": "off",
+    "array-callback-return":"off",
+    "consistent-return": 0,
+    "camelcase":"off",
+    "no-shadow": ["error", { "allow": ["page", "movies", "query"] }],
+    "react/jsx-props-no-spreading": "off",
+    "react/react-in-jsx-scope": "off",
+    "no-return-await": "off",
+    "react/prop-types": 0,
+    "import/no-unresolved": [2, { "caseSensitive": false }],
+    "react/function-component-definition": [2, { "namedComponents": ["function-expression" , "arrow-function", "function-declaration"] }],
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "import/order": [
+      2,
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "newlines-between": "always"
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "moduleDirectory": ["node_modules", "src/"]
+      }
+    }
+  }
+}
