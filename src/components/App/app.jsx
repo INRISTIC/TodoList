@@ -12,14 +12,14 @@ export default class App extends Component {
   // eslint-disable-next-line react/state-in-constructor
   state = {
     todoDate: [
-      this.createTodoItem('Active task'),
-      this.createTodoItem('Completed task'),
-      this.createTodoItem('Create task'),
+      this.createTodoItem('Active task', 90),
+      // this.createTodoItem('Completed task', 160),
+      // this.createTodoItem('Create task', 310),
     ],
     flag: 'All',
   };
 
-  createTodoItem(label) {
+  createTodoItem(label, allTime) {
     return {
       label,
       // eslint-disable-next-line no-plusplus
@@ -27,6 +27,9 @@ export default class App extends Component {
       edit: false,
       completed: false,
       time: new Date(),
+      startTime: allTime,
+      allTime,
+      timerActive: true,
     };
   }
 
@@ -57,8 +60,8 @@ export default class App extends Component {
     });
   };
 
-  addItem = (text) => {
-    const newItem = this.createTodoItem(text);
+  addItem = (text, min, sec) => {
+    const newItem = this.createTodoItem(text, min, sec);
     this.setState(({ todoDate }) => {
       const newArr = [...todoDate, newItem];
       return {
@@ -81,6 +84,48 @@ export default class App extends Component {
     this.setState(({ todoDate }) => {
       return {
         todoDate: this.toggleProperty(todoDate, id, 'edit'),
+      };
+    });
+  };
+
+  onClickPlay = (id) => {
+    this.setState(({ todoDate }) => {
+      const idx = todoDate.findIndex((el) => el.id === id);
+      const oldItem = todoDate[idx];
+      const newItem = { ...oldItem, timerActive: true };
+
+      const newArray = [...todoDate.slice(0, idx), newItem, ...todoDate.slice(idx + 1)];
+
+      return {
+        todoDate: newArray,
+      };
+    });
+  };
+
+  onClickPaused = (id) => {
+    this.setState(({ todoDate }) => {
+      const idx = todoDate.findIndex((el) => el.id === id);
+      const oldItem = todoDate[idx];
+      const newItem = { ...oldItem, timerActive: false };
+
+      const newArray = [...todoDate.slice(0, idx), newItem, ...todoDate.slice(idx + 1)];
+
+      return {
+        todoDate: newArray,
+      };
+    });
+  };
+
+  tick = (id) => {
+    this.setState(({ todoDate }) => {
+      const idx = todoDate.findIndex((el) => el.id === id);
+      const oldItem = todoDate[idx];
+      const count = oldItem.allTime;
+      const newItem = { ...oldItem, allTime: count - 1 };
+      const newArray = [...todoDate.slice(0, idx), newItem, ...todoDate.slice(idx + 1)];
+
+      return {
+        todoDate: newArray,
       };
     });
   };
@@ -112,6 +157,19 @@ export default class App extends Component {
     }
   }
 
+  replayTime = (id, startTime) => {
+    this.setState(({ todoDate }) => {
+      const idx = todoDate.findIndex((el) => el.id === id);
+      const oldItem = todoDate[idx];
+      const newItem = { ...oldItem, allTime: startTime, timerActive: false };
+      const newArray = [...todoDate.slice(0, idx), newItem, ...todoDate.slice(idx + 1)];
+
+      return {
+        todoDate: newArray,
+      };
+    });
+  };
+
   onToggleFilter = (flag) => {
     this.setState({
       flag,
@@ -125,7 +183,10 @@ export default class App extends Component {
     const noCompletedCount = todos.length - completedCount;
     return (
       <section className="todoapp">
-        <NewTaskForm onItemAdded={this.addItem} />
+        <form className="new-todo-form">
+          <NewTaskForm onItemAdded={this.addItem} />
+        </form>
+
         <section className="main">
           <TaskList
             todos={todos}
@@ -133,6 +194,10 @@ export default class App extends Component {
             onEdit={this.editItem}
             onClickEdit={this.onClickEdit}
             onMarkImportant={this.onMarkImportant}
+            onClickPlay={this.onClickPlay}
+            onClickPaused={this.onClickPaused}
+            tick={this.tick}
+            replayTime={this.replayTime}
           />
           <footer className="footer">
             <Footer noCompletedCount={noCompletedCount} />
