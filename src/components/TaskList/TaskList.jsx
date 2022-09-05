@@ -3,32 +3,12 @@ import Proptypes from 'prop-types';
 
 import Task from '../task/Task';
 
-const TaskList = ({
-  todos,
-  onDeleted,
-  onEdit,
-  onClickEdit,
-  onMarkImportant,
-  onClickPlay,
-  onClickPaused,
-  tick,
-  replayTime,
-}) => {
+const TaskList = ({ todos, todo, setTodo }) => {
   const elements = todos.map((item) => {
     const { ...itemProps } = item;
     return (
       <li key={itemProps.id}>
-        <Task
-          {...itemProps}
-          onDeleted={() => onDeleted(itemProps.id)}
-          onEdit={onEdit}
-          onClickEdit={() => onClickEdit(itemProps.id)}
-          onMarkImportant={() => onMarkImportant(itemProps.id)}
-          onClickPlay={() => onClickPlay(itemProps.id)}
-          onClickPaused={() => onClickPaused(itemProps.id)}
-          tick={() => tick(itemProps.id)}
-          replayTime={() => replayTime(itemProps.id, itemProps.startTime)}
-        />
+        <Task todo={todo} setTodo={setTodo} props={itemProps} />
       </li>
     );
   });
@@ -47,14 +27,6 @@ TaskList.proptype = {
       allTime: Proptypes.number.isRequired,
     })
   ),
-  onDeleted: Proptypes.func.isRequired,
-  onEdit: Proptypes.func.isRequired,
-  onClickEdit: Proptypes.func.isRequired,
-  onMarkImportant: Proptypes.func.isRequired,
-  onClickPlay: Proptypes.func.isRequired,
-  onClickPaused: Proptypes.func.isRequired,
-  tick: Proptypes.func.isRequired,
-  replayTime: Proptypes.func.isRequired,
 };
 
 export default TaskList;

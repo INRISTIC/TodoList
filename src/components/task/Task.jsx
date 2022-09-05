@@ -1,104 +1,153 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import Proptypes from 'prop-types';
 import './task.css';
 
-export default class Task extends Component {
-  // eslint-disable-next-line react/sort-comp
-  pressKeyDown = (e, id) => {
-    const { onEdit } = this.props;
-    if (e.key === 'Enter' && e.target.value.trim()) {
-      onEdit(e.target.value, id);
+const Task = ({ todo, setTodo, props }) => {
+  const { id, label, edit, completed, time, allTime, startTime, timerActive } = props;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // eslint-disable-next-line no-unused-expressions,no-use-before-define
+      timerActive && tick(id);
+    }, 1000);
+    if (allTime === 0) {
+      // eslint-disable-next-line no-use-before-define
+      replayTime(id, startTime);
+      clearInterval(interval);
     }
-  };
+    return () => {
+      clearInterval(interval);
+    };
+  }, [timerActive, allTime]);
 
-  // eslint-disable-next-line class-methods-use-this
-  timeReform = (allTime) => {
+  // eslint-disable-next-line no-shadow
+  function timeReform(allTime) {
+    console.log(allTime);
     const newMinute = Math.floor(allTime / 60);
     const newSeconds = allTime % 60;
     return `${newMinute}:${newSeconds}`;
-  };
-
-  componentDidMount() {
-    const { tick, id } = this.props;
-    this.interval = setInterval(() => tick(id), 1000);
   }
 
-  componentDidUpdate(prevProps) {
-    const { tick, id, timerActive, allTime, replayTime, startTime } = this.props;
-    if (allTime === 0) {
-      replayTime(id, startTime);
-      clearInterval(this.interval);
-    } else if (timerActive !== prevProps.timerActive) {
-      if (timerActive) {
-        this.interval = setInterval(() => tick(id), 1000);
-      } else {
-        clearInterval(this.interval);
-      }
+  function deleteItem(idTask) {
+    const idx = todo.findIndex((el) => el.id === idTask);
+
+    const newArray = [...todo.slice(0, idx), ...todo.slice(idx + 1)];
+
+    setTodo(newArray);
+  }
+
+  function editItem(value, idTask) {
+    const idx = todo.findIndex((el) => el.id === idTask);
+    const oldItem = todo[idx];
+    const newItem = { ...oldItem, label: value, edit: false };
+
+    const newArray = [...todo.slice(0, idx), newItem, ...todo.slice(idx + 1)];
+
+    setTodo(newArray);
+  }
+
+  // eslint-disable-next-line no-shadow
+  function pressKeyDown(e, idTask) {
+    if (e.key === 'Enter' && e.target.value.trim()) {
+      editItem(e.target.value, idTask);
     }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
+  // eslint-disable-next-line no-shadow
+  function toggleProperty(arr, idTask, propName) {
+    const idx = arr.findIndex((el) => el.id === idTask);
+
+    const oldItem = arr[idx];
+    const newItem = { ...oldItem, [propName]: !oldItem[propName] };
+
+    return [...arr.slice(0, idx), newItem, ...arr.slice(idx + 1)];
   }
 
-  render() {
-    const {
-      id,
-      label,
-      onDeleted,
-      onClickEdit,
-      edit,
-      onMarkImportant,
-      completed,
-      time,
-      allTime,
-      onClickPlay,
-      onClickPaused,
-    } = this.props;
-
-    let classNames = '';
-    let classNamesInput = 'none';
-
-    if (edit && completed) {
-      classNames = 'editing completed';
-      classNamesInput = 'edit';
-    } else if (completed) {
-      classNames = 'completed';
-    } else if (edit) {
-      classNames = 'editing';
-      classNamesInput = 'edit';
-    }
-
-    return (
-      <span className={classNames}>
-        <div className="view">
-          <input className="toggle" checked={completed} type="checkbox" onChange={onMarkImportant} />
-          <label>
-            <span className="title">{label}</span>
-            <span className="description">
-              <button className="icon icon-play" type="button" onClick={onClickPlay} />
-              <button className="icon icon-pause" type="button" onClick={onClickPaused} />
-              <span className="time-text">{this.timeReform(allTime)}</span>
-            </span>
-            <span className="created description">
-              created
-              {` ${formatDistanceToNow(time, { includeSeconds: true })} `} ago
-            </span>
-          </label>
-          <button className="icon icon-edit" onClick={onClickEdit} type="button" />
-          <button className="icon icon-destroy" onClick={onDeleted} type="button" />
-        </div>
-        <input
-          type="text"
-          className={classNamesInput}
-          defaultValue={label}
-          onKeyDown={(e) => this.pressKeyDown(e, id)}
-        />
-      </span>
-    );
+  // eslint-disable-next-line no-shadow
+  function onClickEdit(idTask) {
+    setTodo(toggleProperty(todo, idTask, 'edit'));
   }
-}
+
+  function onClickPlay(idTask) {
+    const idx = todo.findIndex((el) => el.id === idTask);
+    const oldItem = todo[idx];
+    const newItem = { ...oldItem, timerActive: true };
+
+    const newArray = [...todo.slice(0, idx), newItem, ...todo.slice(idx + 1)];
+
+    setTodo(newArray);
+  }
+
+  function onClickPaused(idTask) {
+    const idx = todo.findIndex((el) => el.id === idTask);
+    const oldItem = todo[idx];
+    const newItem = { ...oldItem, timerActive: false };
+
+    const newArray = [...todo.slice(0, idx), newItem, ...todo.slice(idx + 1)];
+
+    setTodo(newArray);
+  }
+
+  function onMarkImportant(idTask) {
+    setTodo(toggleProperty(todo, idTask, 'completed'));
+  }
+
+  function replayTime(idTask, startTimer) {
+    const idx = todo.findIndex((el) => el.id === idTask);
+    const oldItem = todo[idx];
+    const newItem = { ...oldItem, allTime: startTimer, timerActive: false };
+    const newArray = [...todo.slice(0, idx), newItem, ...todo.slice(idx + 1)];
+
+    setTodo(newArray);
+  }
+
+  function tick(idTask) {
+    const idx = todo.findIndex((el) => el.id === idTask);
+    const oldItem = todo[idx];
+    const count = oldItem.allTime;
+    const newItem = { ...oldItem, allTime: count - 1 };
+    const newArray = [...todo.slice(0, idx), newItem, ...todo.slice(idx + 1)];
+    setTodo(newArray);
+  }
+
+  let classNames = '';
+  let classNamesInput = 'none';
+
+  if (edit && completed) {
+    classNames = 'editing completed';
+    classNamesInput = 'edit';
+  } else if (completed) {
+    classNames = 'completed';
+  } else if (edit) {
+    classNames = 'editing';
+    classNamesInput = 'edit';
+  }
+
+  return (
+    <span className={classNames}>
+      <div className="view">
+        <input className="toggle" checked={completed} type="checkbox" onChange={() => onMarkImportant(id)} />
+        <label>
+          <span className="title">{label}</span>
+          <span className="description">
+            <button className="icon icon-play" type="button" onClick={() => onClickPlay(id)} />
+            <button className="icon icon-pause" type="button" onClick={() => onClickPaused(id)} />
+            <span className="time-text">{timeReform(allTime)}</span>
+          </span>
+          <span className="created description">
+            created
+            {` ${formatDistanceToNow(time, { includeSeconds: true })} `} ago
+          </span>
+        </label>
+        <button className="icon icon-edit" onClick={() => onClickEdit(id)} type="button" />
+        <button className="icon icon-destroy" onClick={() => deleteItem(id)} type="button" />
+      </div>
+      <input type="text" className={classNamesInput} defaultValue={label} onKeyDown={(e) => pressKeyDown(e, id)} />
+    </span>
+  );
+};
+
+export default Task;
 
 Task.proptype = {
   id: Proptypes.string.isRequired,

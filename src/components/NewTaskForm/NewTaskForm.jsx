@@ -1,38 +1,52 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
-export default class NewTaskForm extends Component {
-  // eslint-disable-next-line react/state-in-constructor
-  state = {
-    label: '',
-    // eslint-disable-next-line react/no-unused-state
-    labelMin: '',
-    // eslint-disable-next-line react/no-unused-state
-    labelSec: '',
+const NewTaskForm = ({ todo, setTodo }) => {
+  const [label, setLabel] = useState('');
+  const [labelMin, setLabelMin] = useState('');
+  const [labelSec, setLabelSec] = useState('');
+
+  function onLabelChange(e) {
+    setLabel(e.target.value);
+  }
+
+  function onLabelMinChange(e) {
+    setLabelMin(+e.target.value);
+  }
+
+  function onLabelSecChange(e) {
+    setLabelSec(+e.target.value);
+  }
+
+  // eslint-disable-next-line func-names
+  const uid = function () {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   };
 
-  onLabelChange = (e) => {
-    this.setState({
-      label: e.target.value,
-    });
-  };
+  // eslint-disable-next-line no-shadow
+  function createTodoItem(label, allTime) {
+    return {
+      label, // eslint-disable-next-line no-plusplus
+      id: uid(),
+      edit: false,
+      completed: false,
+      time: new Date(),
+      startTime: allTime,
+      allTime,
+      timerActive: true,
+    };
+  }
 
-  onLabelMinChange = (e) => {
-    this.setState({
-      labelMin: Number(e.target.value),
-    });
-  };
+  function addItem(text, allTime) {
+    const newItem = createTodoItem(text, allTime);
+    const newArr = [...todo, newItem];
 
-  onLabelSecChange = (e) => {
-    this.setState({
-      labelSec: Number(e.target.value),
-    });
-  };
+    setTodo(newArr);
+  }
 
-  onKeyDown = (e) => {
-    const { onItemAdded } = this.props;
-    const { label, labelMin, labelSec } = this.state;
+  function onKeyDown(e) {
     let second;
     let minute;
+
     if (labelMin === '') {
       minute = 1;
     } else {
@@ -44,44 +58,42 @@ export default class NewTaskForm extends Component {
     } else {
       second = labelSec;
     }
-    if (e.key === 'Enter' && label.trim()) {
-      onItemAdded(label, minute * 60 + second);
-      this.setState({
-        label: '',
-        labelMin: '',
-        labelSec: '',
-      });
-    }
-  };
 
-  render() {
-    const { label, labelMin, labelSec } = this.state;
-    return (
-      <header className="header">
-        <h1>todos</h1>
-        <input
-          type="text"
-          className="new-todo"
-          placeholder="What needs to be done?"
-          onChange={this.onLabelChange}
-          onKeyDown={this.onKeyDown}
-          value={label}
-        />
-        <input
-          type="text"
-          className="new-todo-form__timer"
-          placeholder="Min"
-          onChange={this.onLabelMinChange}
-          value={labelMin}
-        />
-        <input
-          type="text"
-          className="new-todo-form__timer"
-          placeholder="Sec"
-          onChange={this.onLabelSecChange}
-          value={labelSec}
-        />
-      </header>
-    );
+    if (e.key === 'Enter' && label.trim()) {
+      addItem(label, minute * 60 + second);
+      setLabel('');
+      setLabelMin('');
+      setLabelSec('');
+    }
   }
-}
+
+  return (
+    <header className="header">
+      <h1>todos</h1>
+      <input
+        type="text"
+        className="new-todo"
+        placeholder="What needs to be done?"
+        onChange={onLabelChange}
+        onKeyDown={onKeyDown}
+        value={label}
+      />
+      <input
+        type="text"
+        className="new-todo-form__timer"
+        placeholder="Min"
+        onChange={onLabelMinChange}
+        value={labelMin}
+      />
+      <input
+        type="text"
+        className="new-todo-form__timer"
+        placeholder="Sec"
+        onChange={onLabelSecChange}
+        value={labelSec}
+      />
+    </header>
+  );
+};
+
+export default NewTaskForm;

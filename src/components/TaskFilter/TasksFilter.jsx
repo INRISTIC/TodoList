@@ -1,8 +1,14 @@
 import React from 'react';
 import Proptypes from 'prop-types';
 
-const TaskFilter = ({ onToggleFilter, flag }) => {
+const TaskFilter = ({ setFlag, flag }) => {
   const filters = ['All', 'Completed', 'Active'];
+
+  // eslint-disable-next-line no-shadow
+  function onToggleFilter(flag) {
+    setFlag(flag);
+  }
+
   return (
     <ul className="filters">
       {filters.map((filter) => (
