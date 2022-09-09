@@ -2,14 +2,16 @@ import React, { useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import Proptypes from 'prop-types';
 import './Task.css';
+import { useState } from 'react';
 
 const Task = ({ todo, setTodo, props }) => {
   const { id, label, edit, completed, time, allTime, startTime, timerActive } = props;
+  const [sec, setSec] = useState(allTime);
   useEffect(() => {
     const interval = setInterval(() => {
-      timerActive && tick(id);
-    }, 1001);
-    if (allTime === 0) {
+      timerActive && setSec((timer) => (timer >= 1 ? timer - 1 : 0))
+    }, 1000);
+    if (sec === 0) {
       replayTime(id, startTime);
       clearInterval(interval);
     }
@@ -18,9 +20,9 @@ const Task = ({ todo, setTodo, props }) => {
     };
   }, [timerActive, allTime]);
 
-  function timeReform(allTime) {
-    const newMinute = Math.floor(allTime / 60);
-    const newSeconds = allTime % 60;
+  function timeReform(sec) {
+    const newMinute = Math.floor(sec / 60);
+    const newSeconds = sec % 60;
     return `${newMinute}:${newSeconds}`;
   }
 
@@ -94,20 +96,11 @@ const Task = ({ todo, setTodo, props }) => {
     setTodo(newArray);
   }
 
-  function tick(idTask) {
-    const idx = todo.findIndex((el) => el.id === idTask);
-    const oldItem = todo[idx];
-    const count = oldItem.allTime;
-    const newItem = { ...oldItem, allTime: count - 1 };
-    const newArray = [...todo.slice(0, idx), newItem, ...todo.slice(idx + 1)];
-    setTodo(newArray);
-  }
-
   let classNames = '';
   let classNamesInput = 'none';
 
   if (edit && completed) {
-    classNames = 'title editing completed';
+    classNames = 'editing completed';
     classNamesInput = 'edit';
   } else if (completed) {
     classNames = 'completed';
@@ -125,7 +118,7 @@ const Task = ({ todo, setTodo, props }) => {
           <span className="description">
             <button className="icon icon-play" type="button" onClick={() => onClickPlay(id)} />
             <button className="icon icon-pause" type="button" onClick={() => onClickPaused(id)} />
-            <span className="time-text">{timeReform(allTime)}</span>
+            <span className="time-text">{timeReform(sec)}</span>
           </span>
           <span className="created description">
             created
