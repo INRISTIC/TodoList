@@ -36,7 +36,7 @@ const NewTaskForm = ({ todo, setTodo }) => {
       time: new Date(),
       startTime: allTime,
       allTime,
-      timerActive: true,
+      timerActive: false,
     };
   }
 
