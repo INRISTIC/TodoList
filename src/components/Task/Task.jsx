@@ -8,13 +8,10 @@ const Task = ({ todo, setTodo, props }) => {
   const { id, label, edit, completed, time, allTime, startTime, timerActive } = props;
   const [sec, setSec] = useState(allTime);
   useEffect(() => {
+    console.log(sec)
     const interval = setInterval(() => {
-      timerActive && setSec((timer) => (timer >= 1 ? timer - 1 : 0));
+      timerActive && setSec((timer) => (timer >= 1 ? timer - 1 : 0))
     }, 1000);
-    if (sec === 0) {
-      replayTime(id, startTime);
-      clearInterval(interval);
-    }
     return () => {
       clearInterval(interval);
     };
@@ -25,6 +22,12 @@ const Task = ({ todo, setTodo, props }) => {
     const newSeconds = sec % 60;
     return `${newMinute}:${newSeconds}`;
   }
+
+  useEffect(() => {
+    if (sec === 0) {
+      replayTime(id, startTime);
+    }
+  }, [sec])
 
   function deleteItem(idTask) {
     const idx = todo.findIndex((el) => el.id === idTask);
@@ -89,6 +92,7 @@ const Task = ({ todo, setTodo, props }) => {
 
   function replayTime(idTask, startTimer) {
     const idx = todo.findIndex((el) => el.id === idTask);
+    setSec(startTimer)
     const oldItem = todo[idx];
     const newItem = { ...oldItem, allTime: startTimer, timerActive: false };
     const newArray = [...todo.slice(0, idx), newItem, ...todo.slice(idx + 1)];
@@ -98,6 +102,8 @@ const Task = ({ todo, setTodo, props }) => {
 
   let classNames = '';
   let classNamesInput = 'none';
+
+  
 
   if (edit && completed) {
     classNames = 'editing completed';
