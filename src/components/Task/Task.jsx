@@ -9,7 +9,7 @@ const Task = ({ todo, setTodo, props }) => {
   const [sec, setSec] = useState(allTime);
   useEffect(() => {
     const interval = setInterval(() => {
-      timerActive && setSec((timer) => (timer >= 1 ? timer - 1 : 0))
+      timerActive && setSec((timer) => (timer >= 1 ? timer - 1 : 0));
     }, 1000);
     if (sec === 0) {
       replayTime(id, startTime);
