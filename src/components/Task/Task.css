@@ -1,3 +1,7 @@
 .none {
     display: none;
 }
+
+.completed .title {
+    text-decoration: line-through;
+}
