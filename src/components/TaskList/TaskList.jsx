@@ -1,20 +1,14 @@
 import React from 'react';
 import Proptypes from 'prop-types';
 
-import Task from '../task/Task';
+import { Task } from '../Task';
 
-const TaskList = ({ todos, onDeleted, onEdit, onClickEdit, onMarkImportant }) => {
+const TaskList = ({ todos, todo, setTodo }) => {
   const elements = todos.map((item) => {
     const { ...itemProps } = item;
     return (
       <li key={itemProps.id}>
-        <Task
-          {...itemProps}
-          onDeleted={() => onDeleted(itemProps.id)}
-          onEdit={onEdit}
-          onClickEdit={() => onClickEdit(itemProps.id)}
-          onMarkImportant={() => onMarkImportant(itemProps.id)}
-        />
+        <Task todo={todo} setTodo={setTodo} props={itemProps} />
       </li>
     );
   });
@@ -29,11 +23,10 @@ TaskList.proptype = {
       completed: Proptypes.bool.isRequired,
       edit: Proptypes.bool.isRequired,
       time: Proptypes.instanceOf(Date).isRequired,
+      startTime: Proptypes.number.isRequired,
+      allTime: Proptypes.number.isRequired,
     })
   ),
-  onDeleted: Proptypes.func.isRequired,
-  onEdit: Proptypes.func.isRequired,
-  editTodo: Proptypes.func.isRequired,
 };
 
 export default TaskList;
