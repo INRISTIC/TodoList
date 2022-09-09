@@ -107,7 +107,7 @@ const Task = ({ todo, setTodo, props }) => {
   let classNamesInput = 'none';
 
   if (edit && completed) {
-    classNames = 'editing completed';
+    classNames = 'title editing completed';
     classNamesInput = 'edit';
   } else if (completed) {
     classNames = 'completed';
@@ -121,7 +121,7 @@ const Task = ({ todo, setTodo, props }) => {
       <div className="view">
         <input className="toggle" checked={completed} type="checkbox" onChange={() => onMarkImportant(id)} id={id} />
         <label htmlFor={id}>
-          <span className=`title ${classNames}`>{label}</span>
+          <span className={classNames}>{label}</span>
           <span className="description">
             <button className="icon icon-play" type="button" onClick={() => onClickPlay(id)} />
             <button className="icon icon-pause" type="button" onClick={() => onClickPaused(id)} />
